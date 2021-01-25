@@ -3,11 +3,11 @@ const Channel = require('./Channel');
 const Collection = require('../util/Collection');
 const Constants = require('../util/Constants');
 const FFZEmote = require('./FFZEmote');
-const request = require('request-promise');
+const got = require('got');
 const TwitchEmote = require('./TwitchEmote');
 
 const options = {
-    json: true
+    responseType: 'json'
 };
 
 class EmoteFetcher {
@@ -50,7 +50,7 @@ class EmoteFetcher {
             ? Constants.Twitch.Global
             : Constants.Twitch.Channel(id); // eslint-disable-line new-cap
 
-        return request({ uri: endpoint, ...options });
+        return got(endpoint, options).json();
     }
 
     /**
@@ -75,16 +75,22 @@ class EmoteFetcher {
 
     /**
      * Gets the raw BTTV emotes data for a channel.
+     * Use `null` for the global emotes channel.
      * @private
-     * @param {string} name - Name of the channel.
+     * @param {int} [id=null] - ID of the channel.
      * @returns {Promise<Object[]>}
      */
-    _getRawBTTVEmotes(name) {
-        const endpoint = !name
+    _getRawBTTVEmotes(id) {
+        const endpoint = !id
             ? Constants.BTTV.Global
-            : Constants.BTTV.Channel(name); // eslint-disable-line new-cap
+            : Constants.BTTV.Channel(id); // eslint-disable-line new-cap
 
-        return request({ uri: endpoint, ...options }).then(body => body.emotes);
+        return got(endpoint, options).then(req => {
+            // Global emotes
+            if (req.body instanceof Array) return req.body;
+            // Channel emotes
+            return [...req.body.channelEmotes, ...req.body.sharedEmotes];
+        });
     }
 
     /**
@@ -110,15 +116,22 @@ class EmoteFetcher {
     /**
      * Gets the raw FFZ emotes data for a channel.
      * @private
-     * @param {string} name - Name of the channel.
+     * @param {(number|string)} id - ID or name of the channel.
      * @returns {Promise<Object[]>}
      */
-    _getRawFFZEmotes(name) {
-        const endpoint = Constants.FFZ.Channel(name); // eslint-disable-line new-cap
-        return request({ uri: endpoint, ...options }).then(body => {
+    _getRawFFZEmotes(id) {
+        let endpoint;
+
+        if (typeof id === 'number') {
+            endpoint = Constants.FFZ.Channel(id); // eslint-disable-line new-cap
+        } else {
+            endpoint = Constants.FFZ.ChannelName(id); // eslint-disable-line new-cap
+        }
+
+        return got(endpoint, options).then(req => {
             const emotes = [];
-            for (const key of Object.keys(body.sets)) {
-                const set = body.sets[key];
+            for (const key of Object.keys(req.body.sets)) {
+                const set = req.body.sets[key];
                 emotes.push(...set.emoticons);
             }
 

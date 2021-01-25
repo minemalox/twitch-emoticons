@@ -17,16 +17,15 @@
   "author": "1Computer",
   "license": "MIT",
   "dependencies": {
-    "request": "^2.88.2",
-    "request-promise": "^4.2.5"
+    "got": "^11.8.2"
   },
   "devDependencies": {
     "docdash": "^1.2.0",
-    "eslint": "6.8.0",
-    "jsdoc": "^3.6.3"
+    "eslint": "7.18.0",
+    "jsdoc": "^3.6.6"
   },
   "scripts": {
-    "docs": "node_modules/.bin/jsdoc --configure .jsdoc.json --verbose --package ''",
+    "docs": "jsdoc --configure .jsdoc.json --verbose --package ''",
     "test": "node test/index.js",
     "lint": "eslint ./src"
   },
@@ -37,5 +36,9 @@
   "bugs": {
     "url": "https://github.com/1Computer1/twitch-emoticons/issues"
   },
-  "homepage": "https://github.com/1Computer1/twitch-emoticons"
+  "homepage": "https://github.com/1Computer1/twitch-emoticons",
+  "directories": {
+    "doc": "docs",
+    "test": "test"
+  }
 }

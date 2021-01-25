@@ -33,5 +33,5 @@ fetcher.fetchTwitchEmotes(null).then(() => {
 
 This library uses the following:  
 - [Twitch Emotes API](https://twitchemotes.com/apidocs)
-- [BetterTTV API](https://api.betterttv.net/)
+- [BetterTTV API](https://betterttv.com/)
 - [FrankerFaceZ API](http://www.frankerfacez.com/developers)
